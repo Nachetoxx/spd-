@@ -1,0 +1,205 @@
+
+#define A 10
+#define B 11
+#define C 5
+#define D 6
+#define E 7
+#define F 9
+#define G 8
+#define AUMENTA 2
+#define BAJA 3
+#define RESET 4
+#define UNIDAD A4
+#define DECENA A5
+#define OFF 0
+#define TIEMPODISPLAY 10
+
+int contador = 0;
+int	aumenta = 1;
+int	baja = 1;
+int reset = 1;
+int baja_estado_anterior = 1;
+int aumenta_estado_anterior = 1;
+int reset_estado_anterior = 1;
+
+void setup() 
+{
+  Serial.begin(9600);
+    
+  pinMode(AUMENTA, INPUT_PULLUP);
+  pinMode(BAJA, INPUT_PULLUP);
+  pinMode(RESET, INPUT_PULLUP);
+  pinMode(A, OUTPUT);
+  pinMode(B, OUTPUT);
+  pinMode(C, OUTPUT);
+  pinMode(D, OUTPUT);
+  pinMode(E, OUTPUT);
+  pinMode(F, OUTPUT);
+  pinMode(G, OUTPUT);
+  pinMode(12,OUTPUT);
+  pinMode(UNIDAD, OUTPUT);
+  pinMode(DECENA, OUTPUT);
+  digitalWrite(UNIDAD, 0);
+  digitalWrite(DECENA, 0);
+  printDigit(0);
+}
+    
+
+void loop()
+{
+
+  int pressed = keypressed(); 
+  
+  if(pressed == AUMENTA){ 
+    contador++;
+    if(contador > 99 )
+    	contador = 0;
+  } else if(pressed == BAJA) {	
+    contador--;
+    if(contador < 0 )
+    	contador = 99;  
+  } else if (pressed == RESET) {
+        contador = 0;
+  }
+  printCount(contador);
+  
+}
+
+void printDigit(int digit){
+  
+  digitalWrite(A, LOW);
+  digitalWrite(B, LOW);
+  digitalWrite(C, LOW);
+  digitalWrite(D, LOW);
+  digitalWrite(E, LOW);
+  digitalWrite(F, LOW);
+  digitalWrite(G, LOW);
+  
+  switch(digit){
+  	case 1:
+        digitalWrite(B, HIGH);
+        digitalWrite(C, HIGH);
+    	break;	
+    case 2:
+        digitalWrite(A, HIGH);
+        digitalWrite(B, HIGH);
+        digitalWrite(D, HIGH);
+        digitalWrite(E, HIGH);
+        digitalWrite(G, HIGH);
+    	break;	
+    case 3:
+        digitalWrite(A, HIGH);
+        digitalWrite(B, HIGH);
+        digitalWrite(C, HIGH);
+        digitalWrite(D, HIGH);
+        digitalWrite(G, HIGH);
+    	break;	
+    case 4:
+        digitalWrite(B, HIGH);
+        digitalWrite(C, HIGH);
+        digitalWrite(F, HIGH);
+        digitalWrite(G, HIGH);
+    	break;	
+    case 5:
+        digitalWrite(A, HIGH);
+        digitalWrite(C, HIGH);
+        digitalWrite(D, HIGH);
+        digitalWrite(F, HIGH);
+        digitalWrite(G, HIGH);
+    	break;	
+    case 6:
+        digitalWrite(C, HIGH);
+        digitalWrite(D, HIGH);
+        digitalWrite(E, HIGH);
+        digitalWrite(F, HIGH);
+        digitalWrite(G, HIGH);
+    	break;	
+    case 7:
+        digitalWrite(A, HIGH);
+        digitalWrite(B, HIGH);
+        digitalWrite(C, HIGH);
+    	break;	
+    case 8:
+        digitalWrite(A, HIGH);
+        digitalWrite(B, HIGH);
+        digitalWrite(C, HIGH);
+        digitalWrite(D, HIGH);
+        digitalWrite(E, HIGH);
+        digitalWrite(F, HIGH);
+        digitalWrite(G, HIGH);
+    	break;	
+    case 9:
+        digitalWrite(A, HIGH);
+        digitalWrite(B, HIGH);
+        digitalWrite(C, HIGH);
+        digitalWrite(F, HIGH);
+        digitalWrite(G, HIGH);
+    	break;	
+    default:
+        digitalWrite(A, HIGH);
+        digitalWrite(B, HIGH);
+        digitalWrite(C, HIGH);
+        digitalWrite(D, HIGH);
+        digitalWrite(E, HIGH);
+        digitalWrite(F, HIGH);
+    	break;	
+  }
+}
+  
+void prendeDigito(int digito){
+
+  if(digito == UNIDAD){
+  	digitalWrite(UNIDAD, LOW); 
+    digitalWrite(DECENA, HIGH); 
+    delay(TIEMPODISPLAY);
+    
+  } else if(digito == DECENA){
+    digitalWrite(UNIDAD, HIGH); 
+    digitalWrite(DECENA, LOW);    
+    delay(TIEMPODISPLAY);  
+
+  } else {
+    digitalWrite(UNIDAD, HIGH);
+    digitalWrite(DECENA, HIGH); 
+  }
+}
+
+
+void printCount (int contador) {
+   prendeDigito(OFF);
+   printDigit(contador/10);
+   prendeDigito(DECENA);
+   prendeDigito(OFF);
+   printDigit(contador - 10*((int)contador/10));
+   prendeDigito(UNIDAD);
+}
+
+   
+int keypressed(void) {
+  
+    aumenta = digitalRead(AUMENTA); 
+    baja = digitalRead(BAJA); 
+    reset = digitalRead(RESET); 
+  
+    if(aumenta)
+        aumenta_estado_anterior = 1;   
+    if(baja)
+        baja_estado_anterior = 1;  
+    if(reset)
+        reset_estado_anterior = 1;
+  
+    if(aumenta == 0 && aumenta != aumenta_estado_anterior) {   
+       aumenta_estado_anterior = aumenta; 
+        return AUMENTA;    
+    }
+    if(baja == 0 && baja != baja_estado_anterior) {
+        baja_estado_anterior = baja; 
+        return BAJA;    
+    } 
+    if(reset == 0 && reset != reset_estado_anterior) {
+        reset_estado_anterior = reset;
+        return RESET;  
+    }
+     return 0; 
+
+}
